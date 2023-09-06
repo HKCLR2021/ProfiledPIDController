@@ -42,27 +42,25 @@ namespace frc {
  */
 class TrapezoidProfile {
  public:
-  using Distance_t = double;
+  using Distance = double;
   using Velocity = double;
-  using Velocity_t = double;
   using Acceleration = double;
-  using Acceleration_t = double; 
   // using Duration = std::chrono::duration<double>;
 
 
   class Constraints {
    public:
     Constraints() {}
-    Constraints(Velocity_t maxVelocity_, Acceleration_t maxAcceleration_)
+    Constraints(Velocity maxVelocity_, Acceleration maxAcceleration_)
         : maxVelocity{maxVelocity_}, maxAcceleration{maxAcceleration_} {}
-    Velocity_t maxVelocity {0};
-    Acceleration_t maxAcceleration {0};
+    Velocity maxVelocity {0};
+    Acceleration maxAcceleration {0};
   };
 
   class State {
    public:
-    Distance_t position {0};
-    Velocity_t velocity {0};
+    Distance position {0};
+    Velocity velocity {0};
     // bool operator==(const State&) const = default;
   };
 
@@ -105,7 +103,7 @@ class TrapezoidProfile {
    *
    * @param target The target distance.
    */
-  Duration TimeLeftUntil(Distance_t target) const;
+  Duration TimeLeftUntil(Distance target) const;
 
   /**
    * Returns the total time the profile takes to reach the goal.

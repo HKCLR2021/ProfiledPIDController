@@ -21,33 +21,33 @@ TrapezoidProfile::Calculate(Duration dt, State goal, State current) {
   // ended at zero velocity
   Duration cutoffBegin =
       m_current.velocity / m_constraints.maxAcceleration;
-  Distance_t cutoffDistBegin =
+  Distance cutoffDistBegin =
       cutoffBegin * cutoffBegin * m_constraints.maxAcceleration / 2.0;
 
   Duration cutoffEnd = goal.velocity / m_constraints.maxAcceleration;
-  Distance_t cutoffDistEnd =
+  Distance cutoffDistEnd =
       cutoffEnd * cutoffEnd * m_constraints.maxAcceleration / 2.0;
 
   // Now we can calculate the parameters as if it was a full trapezoid instead
   // of a truncated one
 
-  Distance_t fullTrapezoidDist =
+  Distance fullTrapezoidDist =
       cutoffDistBegin + (goal.position - m_current.position) + cutoffDistEnd;
 
   Duration accelerationTime =
       m_constraints.maxVelocity / m_constraints.maxAcceleration;
 
-  Distance_t fullSpeedDist =
+  Distance fullSpeedDist =
       fullTrapezoidDist - accelerationTime * accelerationTime * m_constraints.maxAcceleration;
 
   // spdlog::debug("cutoffDistBegin {} | cutoffDistEnd {} | fullTrapezoidDist {} | fullSpeedDist {}", 
   //           cutoffDistBegin, cutoffDistEnd, fullTrapezoidDist, fullSpeedDist);
 
   // Handle the case where the profile never reaches full speed
-  if (fullSpeedDist < Distance_t{0}) {
+  if (fullSpeedDist < Distance{0}) {
     accelerationTime =
         std::sqrt(fullTrapezoidDist / m_constraints.maxAcceleration);
-    fullSpeedDist = Distance_t{0};
+    fullSpeedDist = Distance{0};
   }
 
   m_endAccel = accelerationTime - cutoffBegin;
@@ -95,9 +95,9 @@ TrapezoidProfile::Calculate(Duration dt, State goal, State current) {
   return Direct(result);
 }
 
-Duration TrapezoidProfile::TimeLeftUntil( Distance_t target) const {
-  Distance_t position = m_current.position * m_direction;
-  Velocity_t velocity = m_current.velocity * m_direction;
+Duration TrapezoidProfile::TimeLeftUntil( Distance target) const {
+  Distance position = m_current.position * m_direction;
+  Velocity velocity = m_current.velocity * m_direction;
 
   Duration endAccel = m_endAccel * m_direction;
   Duration endFullSpeed = m_endFullSpeed * m_direction - endAccel;
@@ -111,20 +111,20 @@ Duration TrapezoidProfile::TimeLeftUntil( Distance_t target) const {
   endAccel = std::max(endAccel, 0.0);
   endFullSpeed = std::max(endFullSpeed, 0.0);
 
-  const Acceleration_t acceleration = m_constraints.maxAcceleration;
-  const Acceleration_t decceleration = -m_constraints.maxAcceleration;
+  const Acceleration acceleration = m_constraints.maxAcceleration;
+  const Acceleration decceleration = -m_constraints.maxAcceleration;
 
-  Distance_t distToTarget = std::abs(target - position);
+  Distance distToTarget = std::abs(target - position);
 
   // if (distToTarget < Distance_t{1e-6}) {
-  if (distToTarget < Distance_t{0}) {
+  if (distToTarget < Distance{0}) {
     return 0;
   }
 
-  Distance_t accelDist =
+  Distance accelDist =
       velocity * endAccel + 0.5 * acceleration * endAccel * endAccel;
 
-  Velocity_t deccelVelocity;
+  Velocity deccelVelocity;
   if (endAccel > 0) {
     deccelVelocity = std::sqrt(
         std::abs(velocity * velocity + 2 * acceleration * accelDist));
@@ -132,16 +132,16 @@ Duration TrapezoidProfile::TimeLeftUntil( Distance_t target) const {
     deccelVelocity = velocity;
   }
 
-  Distance_t fullSpeedDist = m_constraints.maxVelocity * endFullSpeed;
-  Distance_t deccelDist;
+  Distance fullSpeedDist = m_constraints.maxVelocity * endFullSpeed;
+  Distance deccelDist;
 
   if (accelDist > distToTarget) {
     accelDist = distToTarget;
-    fullSpeedDist = Distance_t{0};
-    deccelDist = Distance_t{0};
+    fullSpeedDist = Distance{0};
+    deccelDist = Distance{0};
   } else if (accelDist + fullSpeedDist > distToTarget) {
     fullSpeedDist = distToTarget - accelDist;
-    deccelDist = Distance_t{0};
+    deccelDist = Distance{0};
   } else {
     deccelDist = distToTarget - fullSpeedDist - accelDist;
   }

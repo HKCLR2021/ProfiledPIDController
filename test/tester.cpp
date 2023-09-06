@@ -11,7 +11,7 @@ void testTrapezoidProfile()
 
   frc::TrapezoidProfile profile{constraints};
   for (int i = 0; i < 280; ++i) {
-    state = profile.Calculate(kDt, goal, state);\
+    state = profile.Calculate(kDt, goal, state);
     spdlog::info("idx[{}] time[{:0.2f}] pos[{:0.2f}/{}], vel[{:0.2f} mm/s]\n", 
             i, i*kDt, state.position, goal.position, state.velocity);
     if ( std::abs(goal.position - state.position) == 0 ) {

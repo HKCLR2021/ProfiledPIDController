@@ -12,11 +12,9 @@ namespace frc {
  */
 class ProfiledPIDController {
  public:
-  using Distance_t = double;
+  using Distance = double;
   using Velocity = double;
-  using Velocity_t = double;
   using Acceleration = double;
-  using Acceleration_t = double; 
   using State = typename TrapezoidProfile::State;
   using Constraints = typename TrapezoidProfile::Constraints;
 
@@ -154,7 +152,7 @@ class ProfiledPIDController {
    *
    * @param goal The desired unprofiled setpoint.
    */
-  void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t{0}}; }
+  void SetGoal(Distance goal) { m_goal = {goal, Velocity{0}}; }
 
   /**
    * Gets the goal for the ProfiledPIDController.
@@ -220,8 +218,8 @@ class ProfiledPIDController {
    * @param positionTolerance Position error which is tolerable.
    * @param velocityTolerance Velocity error which is tolerable.
    */
-  void SetTolerance(Distance_t positionTolerance,
-                    Velocity_t velocityTolerance = Velocity_t{
+  void SetTolerance(Distance positionTolerance,
+                    Velocity velocityTolerance = Velocity{
                         std::numeric_limits<double>::infinity()}) {
     m_controller.SetTolerance(positionTolerance,
                               velocityTolerance);
@@ -232,15 +230,15 @@ class ProfiledPIDController {
    *
    * @return The error.
    */
-  Distance_t GetPositionError() const {
-    return Distance_t{m_controller.GetPositionError()};
+  Distance GetPositionError() const {
+    return Distance{m_controller.GetPositionError()};
   }
 
   /**
    * Returns the change in error per second.
    */
-  Velocity_t GetVelocityError() const {
-    return Velocity_t{m_controller.GetVelocityError()};
+  Velocity GetVelocityError() const {
+    return Velocity{m_controller.GetVelocityError()};
   }
 
   /**
@@ -248,7 +246,7 @@ class ProfiledPIDController {
    *
    * @param measurement The current measurement of the process variable.
    */
-  double Calculate(Distance_t measurement) {
+  double Calculate(Distance measurement) {
     frc::TrapezoidProfile profile{m_constraints};
     m_setpoint = profile.Calculate(GetPeriod(), m_goal, m_setpoint);
     return m_controller.Calculate(measurement,
@@ -261,7 +259,7 @@ class ProfiledPIDController {
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
    */
-  double Calculate(Distance_t measurement, State goal) {
+  double Calculate(Distance measurement, State goal) {
     SetGoal(goal);
     return Calculate(measurement);
   }
@@ -272,7 +270,7 @@ class ProfiledPIDController {
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
    */
-  double Calculate(Distance_t measurement, Distance_t goal) {
+  double Calculate(Distance measurement, Distance goal) {
     SetGoal(goal);
     return Calculate(measurement);
   }
@@ -285,7 +283,7 @@ class ProfiledPIDController {
    * @param constraints Velocity and acceleration constraints for goal.
    */
   double Calculate(
-      Distance_t measurement, Distance_t goal,
+      Distance measurement, Distance goal,
        frc::TrapezoidProfile::Constraints constraints) {
     SetConstraints(constraints);
     return Calculate(measurement, goal);
@@ -307,7 +305,7 @@ class ProfiledPIDController {
    * @param measuredPosition The current measured position of the system.
    * @param measuredVelocity The current measured velocity of the system.
    */
-  void Reset(Distance_t measuredPosition, Velocity_t measuredVelocity) {
+  void Reset(Distance measuredPosition, Velocity measuredVelocity) {
     Reset(State{measuredPosition, measuredVelocity});
   }
 
@@ -317,14 +315,14 @@ class ProfiledPIDController {
    * @param measuredPosition The current measured position of the system. The
    * velocity is assumed to be zero.
    */
-  void Reset(Distance_t measuredPosition) {
-    Reset(measuredPosition, Velocity_t{0});
+  void Reset(Distance measuredPosition) {
+    Reset(measuredPosition, Velocity{0});
   }
 
  private:
   PIDController m_controller;
-  Distance_t m_minimumInput{0};
-  Distance_t m_maximumInput{0};
+  Distance m_minimumInput{0};
+  Distance m_maximumInput{0};
   typename frc::TrapezoidProfile::State m_goal;
   typename frc::TrapezoidProfile::State m_setpoint;
   typename frc::TrapezoidProfile::Constraints m_constraints;
